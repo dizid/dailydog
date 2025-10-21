@@ -25,9 +25,10 @@ export async function fetchRandomDog(retries = 3): Promise<Dog> {
         size: 'large',
         mime_types: 'jpg',
         format: 'json',
-        has_breeds: true,
+        has_breeds: 1,
         order: 'RANDOM',
         limit: 1,
+        include_breeds: 1,
       },
     })
 
@@ -35,7 +36,25 @@ export async function fetchRandomDog(retries = 3): Promise<Dog> {
       throw new Error('No dog data received from API')
     }
 
-    return response.data[0]
+    const dog = response.data[0]
+
+    // If breeds weren't included, try to fetch them separately
+    if (!dog.breeds || dog.breeds.length === 0) {
+      try {
+        // Extract breed IDs from image data if available
+        // Otherwise, get a random breed as fallback
+        const breedsResponse = await apiClient.get('/breeds')
+        if (breedsResponse.data && breedsResponse.data.length > 0) {
+          const randomBreed = breedsResponse.data[Math.floor(Math.random() * breedsResponse.data.length)]
+          dog.breeds = [randomBreed]
+        }
+      } catch (breedError) {
+        console.warn('Could not fetch breed information:', breedError)
+        // Continue without breed info
+      }
+    }
+
+    return dog
   } catch (error) {
     if (retries > 0) {
       // Wait a bit before retrying

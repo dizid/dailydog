@@ -84,9 +84,10 @@ export const useDogStore = defineStore('dog', () => {
   }
 
   const toggleFavorite = (dog: Dog) => {
-    if (!dog.breeds || dog.breeds.length === 0) return
+    if (!dog || !dog.id) {
+      return
+    }
 
-    const breed = dog.breeds[0]
     const favoriteIndex = favorites.value.findIndex(
       f => f.dogId === dog.id
     )
@@ -96,11 +97,15 @@ export const useDogStore = defineStore('dog', () => {
       favorites.value.splice(favoriteIndex, 1)
     } else {
       // Add to favorites
+      const breedName = dog.breeds && dog.breeds.length > 0
+        ? dog.breeds[0].name
+        : 'Unknown Breed'
+
       favorites.value.push({
         id: `fav_${Date.now()}`,
         dogId: dog.id,
         imageUrl: dog.url,
-        breed: breed.name,
+        breed: breedName,
         addedAt: Date.now(),
       })
     }

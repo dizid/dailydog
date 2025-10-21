@@ -72,7 +72,7 @@
     <div class="max-w-2xl mx-auto grid grid-cols-2 md:grid-cols-3 gap-4 mt-12">
       <StatCard icon="❤️" label="Favorites" :value="store.favoriteCount" />
       <StatCard icon="📜" label="Viewed" :value="store.historyCount" />
-      <StatCard icon="🐕" label="Breeds" value="Countless" />
+      <StatCard icon="🐕" label="Explored" :value="store.historyCount + store.favoriteCount" />
     </div>
   </main>
 </template>

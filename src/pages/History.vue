@@ -123,13 +123,14 @@ const store = useDogStore()
 const showConfirm = ref(false)
 
 const uniqueBreeds = computed(() => {
-  const breeds = new Set<string>()
+  // Count unique dogs viewed (since breed info may not be available)
+  const uniqueDogs = new Set<string>()
   store.history.forEach(dog => {
-    if (dog.breeds?.[0]?.name) {
-      breeds.add(dog.breeds[0].name)
+    if (dog.id) {
+      uniqueDogs.add(dog.id)
     }
   })
-  return breeds.size
+  return uniqueDogs.size
 })
 
 const confirmClear = () => {

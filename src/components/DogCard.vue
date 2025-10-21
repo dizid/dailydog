@@ -17,7 +17,7 @@
 
       <!-- Favorite Button -->
       <button
-        @click="toggleFavorite"
+        @click="emit('toggle')"
         class="absolute top-4 right-4 w-12 h-12 rounded-full glass-effect flex items-center justify-center text-2xl transition-all duration-200 hover:scale-110 active:scale-95"
         :title="isFavorited ? 'Remove from favorites' : 'Add to favorites'"
       >
@@ -75,7 +75,7 @@ const props = withDefaults(defineProps<Props>(), {
   isFavorited: false,
 })
 
-defineEmits<Emits>()
+const emit = defineEmits<Emits>()
 
 const breed = computed(() => {
   if (!props.dog?.breeds || props.dog.breeds.length === 0) {
@@ -83,10 +83,4 @@ const breed = computed(() => {
   }
   return props.dog.breeds[0]
 })
-
-const toggleFavorite = () => {
-  emit('toggle')
-}
-
-const emit = defineEmits<Emits>()
 </script>

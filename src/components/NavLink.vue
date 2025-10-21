@@ -31,13 +31,11 @@ interface Props {
   badge?: number
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
 
 const route = useRoute()
 
 const isActive = computed(() => {
   return route.path === (props.to as string)
 })
-
-const props = defineProps<Props>()
 </script>

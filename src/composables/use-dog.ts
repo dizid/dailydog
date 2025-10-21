@@ -25,7 +25,10 @@ export function useDog() {
     }
   })
 
-  const isFavorited = computed(() => store.isFavorited(store.currentDog!))
+  const isFavorited = computed(() => {
+    if (!store.currentDog) return false
+    return store.isFavorited(store.currentDog)
+  })
 
   const toggleFavorite = () => {
     if (store.currentDog) {
