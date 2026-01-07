@@ -103,7 +103,7 @@ export function useDogDetail(dogId: string) {
     isLoadingEnrichment.value = true
     try {
       const info = await fetchEnrichedBreedInfo(breedName)
-      if (info) {
+      if (info && info.breedName) {
         // Add fetchedAt timestamp and cache it
         const enrichedWithTimestamp = {
           ...info,

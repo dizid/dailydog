@@ -164,6 +164,7 @@ export const useDogStore = defineStore('dog', () => {
 
   // Cache enriched breed info
   const cacheEnrichedBreedInfo = (info: EnrichedBreedInfo) => {
+    if (!info?.breedName) return // Guard against undefined
     const key = info.breedName.toLowerCase()
     enrichedBreedCache.value[key] = {
       ...info,
