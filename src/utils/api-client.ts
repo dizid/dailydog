@@ -108,20 +108,118 @@ export async function fetchDogById(dogId: string): Promise<Dog | null> {
 }
 
 /**
- * Fetch enriched breed information from the serverless function
+ * Fetch enriched breed information directly from Wikipedia API
  * @param breedName - The name of the breed
  * @returns Promise<EnrichedBreedInfo | null> - Enriched info or null on failure
  */
 export async function fetchEnrichedBreedInfo(breedName: string): Promise<EnrichedBreedInfo | null> {
-  try {
-    const response = await axios.get<EnrichedBreedInfo>(
-      '/.netlify/functions/breed-info',
-      { params: { breed: breedName } }
-    )
-    return response.data || null
-  } catch (error) {
-    console.error('Failed to fetch enriched breed info:', error)
-    return null
+  const formattedName = breedName.replace(/\s+/g, '_')
+
+  // Try different Wikipedia article patterns
+  const patterns = [
+    `${formattedName}_(dog)`,
+    `${formattedName}_dog`,
+    formattedName,
+  ]
+
+  for (const pattern of patterns) {
+    try {
+      const response = await axios.get(
+        `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(pattern)}`
+      )
+
+      if (response.data?.extract) {
+        const extract = response.data.extract.toLowerCase()
+        // Make sure it's about a dog breed
+        if (extract.includes('dog') || extract.includes('breed') || extract.includes('canine')) {
+          return parseWikipediaToBreedInfo(breedName, response.data.extract)
+        }
+      }
+    } catch {
+      // Try next pattern
+    }
+  }
+
+  // Return fallback info if Wikipedia doesn't have the breed
+  return getFallbackBreedInfo(breedName)
+}
+
+function parseWikipediaToBreedInfo(breedName: string, extract: string): EnrichedBreedInfo {
+  const sentences = extract.split(/(?<=[.!?])\s+/).filter((s: string) => s.length > 10)
+  const lowerExtract = extract.toLowerCase()
+
+  return {
+    breedName,
+    fetchedAt: Date.now(),
+    history: sentences.slice(0, 2).join(' ') || `The ${breedName} is a distinguished dog breed with a rich history.`,
+    careTips: getCareTips(breedName, lowerExtract),
+    healthConcerns: getHealthConcerns(breedName, lowerExtract),
+    exerciseNeeds: getExerciseNeeds(breedName, lowerExtract),
+    grooming: getGrooming(breedName, lowerExtract),
+    trainability: getTrainability(breedName, lowerExtract),
+  }
+}
+
+function getCareTips(breedName: string, extract: string): string {
+  if (extract.includes('active') || extract.includes('energetic')) {
+    return `The ${breedName} is an active breed requiring regular exercise and mental stimulation. Provide a balanced diet appropriate for their activity level.`
+  }
+  if (extract.includes('companion') || extract.includes('lap dog')) {
+    return `The ${breedName} thrives on human companionship. Regular grooming, dental care, and quality time with their family are essential.`
+  }
+  return `Provide fresh water daily, high-quality dog food appropriate for their age and size, and regular veterinary check-ups.`
+}
+
+function getHealthConcerns(breedName: string, extract: string): string {
+  if (extract.includes('large') || extract.includes('giant')) {
+    return `Like many larger breeds, the ${breedName} may be prone to hip dysplasia and joint issues. Regular vet check-ups are important.`
+  }
+  if (extract.includes('small') || extract.includes('toy')) {
+    return `Small breeds like the ${breedName} may be prone to dental issues and patellar luxation. Regular dental care helps maintain health.`
+  }
+  return `Regular veterinary check-ups help catch any health concerns early. Preventive care including vaccinations and parasite prevention is key.`
+}
+
+function getExerciseNeeds(breedName: string, extract: string): string {
+  if (extract.includes('hunting') || extract.includes('working') || extract.includes('herding')) {
+    return `Originally bred for work, the ${breedName} has high energy levels and needs substantial daily exercise. Long walks or runs are ideal.`
+  }
+  if (extract.includes('companion') || extract.includes('toy') || extract.includes('lap')) {
+    return `The ${breedName} has moderate exercise needs. Daily walks and indoor play sessions are usually sufficient.`
+  }
+  return `The ${breedName} benefits from 30-60 minutes of exercise daily including walks, playtime, and mental stimulation.`
+}
+
+function getGrooming(breedName: string, extract: string): string {
+  if (extract.includes('long coat') || extract.includes('long-haired') || extract.includes('fluffy')) {
+    return `The ${breedName}'s coat requires regular brushing several times a week to prevent matting. Professional grooming every 6-8 weeks is recommended.`
+  }
+  if (extract.includes('short coat') || extract.includes('smooth coat') || extract.includes('short-haired')) {
+    return `The ${breedName} has a low-maintenance coat that requires weekly brushing. Regular nail trimming and ear cleaning complete their routine.`
+  }
+  return `Regular brushing, nail trimming, ear cleaning, and dental care are important. Grooming frequency depends on coat type.`
+}
+
+function getTrainability(breedName: string, extract: string): string {
+  if (extract.includes('intelligent') || extract.includes('eager to please') || extract.includes('trainable')) {
+    return `The ${breedName} is known for being highly intelligent and eager to please, making them relatively easy to train.`
+  }
+  if (extract.includes('independent') || extract.includes('stubborn')) {
+    return `The ${breedName} has an independent nature and may require patient, consistent training with high-value rewards.`
+  }
+  return `The ${breedName} responds well to positive reinforcement training. Consistency and patience are key to success.`
+}
+
+function getFallbackBreedInfo(breedName: string): EnrichedBreedInfo {
+  return {
+    breedName,
+    fetchedAt: Date.now(),
+    history: `The ${breedName} is a beloved companion dog with a rich heritage and unique characteristics.`,
+    careTips: 'Provide fresh water daily, high-quality dog food, and regular veterinary check-ups. Mental stimulation through toys and training is essential.',
+    healthConcerns: 'Common concerns vary by breed but may include hip dysplasia, eye conditions, and dental issues. Regular vet visits help catch problems early.',
+    exerciseNeeds: 'Most dogs need at least 30-60 minutes of exercise daily including walks, playtime, and mental stimulation activities.',
+    grooming: 'Regular brushing, nail trimming, ear cleaning, and dental care are important for all breeds.',
+    trainability: 'Positive reinforcement training works well for most dogs. Consistency and patience are key to successful training.',
   }
 }
 
