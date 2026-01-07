@@ -24,10 +24,11 @@
     <!-- Favorites Grid -->
     <div v-else>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div
+        <RouterLink
           v-for="favorite in store.favorites"
           :key="favorite.id"
-          class="card-puppy overflow-hidden group animate-fade-in"
+          :to="{ name: 'DogDetail', params: { id: favorite.dogId } }"
+          class="card-puppy overflow-hidden group animate-fade-in block cursor-pointer"
         >
           <!-- Image -->
           <div class="relative overflow-hidden bg-gray-200 dark:bg-slate-700 h-64">
@@ -39,7 +40,7 @@
 
             <!-- Remove Button -->
             <button
-              @click="store.toggleFavorite({ id: favorite.dogId, url: favorite.imageUrl, breeds: [{ name: favorite.breed }] } as any)"
+              @click.stop.prevent="store.toggleFavorite({ id: favorite.dogId, url: favorite.imageUrl, breeds: [{ name: favorite.breed }] } as any)"
               class="absolute top-4 right-4 w-10 h-10 rounded-full glass-effect flex items-center justify-center text-lg transition-all duration-200 hover:scale-110 active:scale-95 hover:bg-red-500/20"
               title="Remove from favorites"
             >
@@ -58,7 +59,7 @@
               Added {{ formatDate(favorite.addedAt) }}
             </p>
           </div>
-        </div>
+        </RouterLink>
       </div>
 
       <!-- Clear Button -->

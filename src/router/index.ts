@@ -19,6 +19,11 @@ const routes = [
     name: 'History',
     component: History,
   },
+  {
+    path: '/dog/:id',
+    name: 'DogDetail',
+    component: () => import('@/pages/DogDetail.vue'),
+  },
 ]
 
 const router = createRouter({

@@ -24,10 +24,11 @@
     <!-- History Grid -->
     <div v-else>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        <div
+        <RouterLink
           v-for="(dog, index) in store.history"
           :key="dog.id"
-          class="card-puppy overflow-hidden group animate-fade-in hover:shadow-puppy-lg transition-all"
+          :to="{ name: 'DogDetail', params: { id: dog.id } }"
+          class="card-puppy overflow-hidden group animate-fade-in hover:shadow-puppy-lg transition-all block cursor-pointer"
           :style="{ animationDelay: `${index * 50}ms` }"
         >
           <!-- Image -->
@@ -44,7 +45,7 @@
 
             <!-- Favorite Button -->
             <button
-              @click="toggleFavoriteDirect(dog)"
+              @click.stop.prevent="toggleFavoriteDirect(dog)"
               class="absolute top-4 right-4 w-10 h-10 rounded-full glass-effect flex items-center justify-center text-lg transition-all duration-200 hover:scale-110 active:scale-95"
               :title="isFavoritedDog(dog) ? 'Remove from favorites' : 'Add to favorites'"
             >
@@ -61,7 +62,7 @@
               {{ dog.breeds?.[0]?.temperament || 'Wonderful companion' }}
             </p>
           </div>
-        </div>
+        </RouterLink>
       </div>
 
       <!-- Stats -->

@@ -1,10 +1,12 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { Dog, FavoriteDog } from '@/types'
+import type { Dog, FavoriteDog, EnrichedBreedInfo } from '@/types'
 import { fetchRandomDog, fetchMultipleDogs } from '@/utils/api-client'
 
 const STORAGE_KEY_FAVORITES = 'dailydog_favorites'
 const STORAGE_KEY_HISTORY = 'dailydog_history'
+const STORAGE_KEY_BREED_CACHE = 'dailydog_breed_cache'
+const CACHE_DURATION = 7 * 24 * 60 * 60 * 1000 // 7 days
 
 export const useDogStore = defineStore('dog', () => {
   // State
@@ -14,6 +16,7 @@ export const useDogStore = defineStore('dog', () => {
   const favorites = ref<FavoriteDog[]>([])
   const history = ref<Dog[]>([])
   const isDarkMode = ref(false)
+  const enrichedBreedCache = ref<Record<string, EnrichedBreedInfo>>({})
 
   // Load persisted data from localStorage
   const loadPersistedData = () => {
@@ -31,6 +34,11 @@ export const useDogStore = defineStore('dog', () => {
       const savedTheme = localStorage.getItem('theme')
       isDarkMode.value = savedTheme === 'dark'
       applyTheme()
+
+      const savedBreedCache = localStorage.getItem(STORAGE_KEY_BREED_CACHE)
+      if (savedBreedCache) {
+        enrichedBreedCache.value = JSON.parse(savedBreedCache)
+      }
     } catch (err) {
       console.error('Error loading persisted data:', err)
     }
@@ -128,6 +136,42 @@ export const useDogStore = defineStore('dog', () => {
     applyTheme()
   }
 
+  // Get a dog by ID from current dog or history
+  const getDogById = (dogId: string): Dog | null => {
+    if (currentDog.value?.id === dogId) {
+      return currentDog.value
+    }
+    return history.value.find(d => d.id === dogId) || null
+  }
+
+  // Get a favorite by dog ID
+  const getFavoriteByDogId = (dogId: string): FavoriteDog | null => {
+    return favorites.value.find(f => f.dogId === dogId) || null
+  }
+
+  // Get cached enriched breed info (checks expiry)
+  const getEnrichedBreedInfo = (breedName: string): EnrichedBreedInfo | null => {
+    const key = breedName.toLowerCase()
+    const cached = enrichedBreedCache.value[key]
+    if (!cached) return null
+
+    // Check if cache is expired
+    if (Date.now() - cached.fetchedAt > CACHE_DURATION) {
+      return null
+    }
+    return cached
+  }
+
+  // Cache enriched breed info
+  const cacheEnrichedBreedInfo = (info: EnrichedBreedInfo) => {
+    const key = info.breedName.toLowerCase()
+    enrichedBreedCache.value[key] = {
+      ...info,
+      fetchedAt: Date.now(),
+    }
+    localStorage.setItem(STORAGE_KEY_BREED_CACHE, JSON.stringify(enrichedBreedCache.value))
+  }
+
   // Computed
   const isFavorited = computed(
     () => (dog: Dog) => favorites.value.some(f => f.dogId === dog.id)
@@ -146,6 +190,7 @@ export const useDogStore = defineStore('dog', () => {
     favorites,
     history,
     isDarkMode,
+    enrichedBreedCache,
     fetchNewDog,
     toggleFavorite,
     isFavorited,
@@ -154,5 +199,9 @@ export const useDogStore = defineStore('dog', () => {
     clearHistory,
     clearFavorites,
     toggleDarkMode,
+    getDogById,
+    getFavoriteByDogId,
+    getEnrichedBreedInfo,
+    cacheEnrichedBreedInfo,
   }
 })

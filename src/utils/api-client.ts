@@ -1,5 +1,5 @@
 import axios from 'axios'
-import type { Dog } from '@/types'
+import type { Dog, EnrichedBreedInfo } from '@/types'
 
 const API_BASE_URL = 'https://api.thedogapi.com/v1'
 const API_KEY = import.meta.env.VITE_DOG_API_KEY || ''
@@ -89,6 +89,39 @@ export async function fetchMultipleDogs(count: number = 5): Promise<Dog[]> {
   } catch (error) {
     console.error('Failed to fetch multiple dogs:', error)
     throw new Error('Unable to fetch dogs. Please try again!')
+  }
+}
+
+/**
+ * Fetch a specific dog by its image ID
+ * @param dogId - The dog image ID
+ * @returns Promise<Dog | null> - Dog object or null if not found
+ */
+export async function fetchDogById(dogId: string): Promise<Dog | null> {
+  try {
+    const response = await apiClient.get<Dog>(`/images/${dogId}`)
+    return response.data || null
+  } catch (error) {
+    console.error('Failed to fetch dog by ID:', error)
+    return null
+  }
+}
+
+/**
+ * Fetch enriched breed information from the serverless function
+ * @param breedName - The name of the breed
+ * @returns Promise<EnrichedBreedInfo | null> - Enriched info or null on failure
+ */
+export async function fetchEnrichedBreedInfo(breedName: string): Promise<EnrichedBreedInfo | null> {
+  try {
+    const response = await axios.get<EnrichedBreedInfo>(
+      '/.netlify/functions/breed-info',
+      { params: { breed: breedName } }
+    )
+    return response.data || null
+  } catch (error) {
+    console.error('Failed to fetch enriched breed info:', error)
+    return null
   }
 }
 

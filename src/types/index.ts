@@ -24,3 +24,14 @@ export interface FavoriteDog {
   breed: string
   addedAt: number
 }
+
+export interface EnrichedBreedInfo {
+  breedName: string
+  fetchedAt: number
+  history: string
+  careTips: string
+  healthConcerns: string
+  exerciseNeeds: string
+  grooming: string
+  trainability: string
+}
