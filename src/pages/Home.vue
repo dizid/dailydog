@@ -60,6 +60,39 @@
           <span>{{ isFavorited ? '❤️ Favorited' : '🤍 Favorite' }}</span>
         </button>
       </div>
+
+      <!-- Breed Info Section -->
+      <div v-if="!isLoading && currentDog" class="mt-8">
+        <div class="card-puppy p-6">
+          <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white flex items-center gap-2">
+            <span>📚</span>
+            <span>About This Breed</span>
+          </h2>
+
+          <!-- Loading Skeleton -->
+          <div v-if="isLoadingEnrichment" class="space-y-4">
+            <div v-for="i in 4" :key="i" class="space-y-2">
+              <div class="h-4 bg-gray-200 dark:bg-slate-700 rounded w-20 animate-pulse"></div>
+              <div class="h-4 bg-gray-200 dark:bg-slate-700 rounded w-full animate-pulse"></div>
+            </div>
+          </div>
+
+          <!-- Enriched Content -->
+          <div v-else-if="enrichedInfo" class="space-y-4">
+            <BreedInfoSection icon="📖" title="History" :content="enrichedInfo.history" />
+            <BreedInfoSection icon="💡" title="Care Tips" :content="enrichedInfo.careTips" />
+            <BreedInfoSection icon="🏥" title="Health" :content="enrichedInfo.healthConcerns" />
+            <BreedInfoSection icon="🏃" title="Exercise" :content="enrichedInfo.exerciseNeeds" />
+            <BreedInfoSection icon="✨" title="Grooming" :content="enrichedInfo.grooming" />
+            <BreedInfoSection icon="🎓" title="Training" :content="enrichedInfo.trainability" />
+          </div>
+
+          <!-- Fallback -->
+          <div v-else class="text-center py-4 text-gray-500 dark:text-gray-400">
+            <p>Loading breed information...</p>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Error Alert -->
@@ -84,6 +117,7 @@ import DogCard from '@/components/DogCard.vue'
 import LoadingSkeleton from '@/components/LoadingSkeleton.vue'
 import ErrorAlert from '@/components/ErrorAlert.vue'
 import StatCard from '@/components/StatCard.vue'
+import BreedInfoSection from '@/components/BreedInfoSection.vue'
 
 const store = useDogStore()
 const {
@@ -93,6 +127,8 @@ const {
   isFavorited,
   toggleFavorite,
   fetchNewDog,
+  enrichedInfo,
+  isLoadingEnrichment,
 } = useDog()
 
 // Fetch initial dog on mount

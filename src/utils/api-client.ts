@@ -3,6 +3,7 @@ import type { Dog, EnrichedBreedInfo } from '@/types'
 
 const API_BASE_URL = 'https://api.thedogapi.com/v1'
 const API_KEY = import.meta.env.VITE_DOG_API_KEY || ''
+const WIKIPEDIA_ACCESS_TOKEN = import.meta.env.VITE_WIKIPEDIA_ACCESS_TOKEN || ''
 
 // Create axios instance with default config
 const apiClient = axios.create({
@@ -124,8 +125,13 @@ export async function fetchEnrichedBreedInfo(breedName: string): Promise<Enriche
 
   for (const pattern of patterns) {
     try {
+      const headers: Record<string, string> = {}
+      if (WIKIPEDIA_ACCESS_TOKEN) {
+        headers['Authorization'] = `Bearer ${WIKIPEDIA_ACCESS_TOKEN}`
+      }
       const response = await axios.get(
-        `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(pattern)}`
+        `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(pattern)}`,
+        { headers }
       )
 
       if (response.data?.extract) {

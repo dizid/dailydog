@@ -38,7 +38,8 @@
 
 ### APIs & Services
 - **The Dog API** - Dog pictures and breed data
-- **Netlify Functions** - Serverless API proxy for security
+- **Wikipedia API** - Enriched breed information (history, care tips, etc.)
+- **Netlify Functions** - Optional serverless API proxy available
 - **localStorage** - Client-side persistent storage
 
 ## 📋 Project Structure
@@ -53,12 +54,14 @@ dailydog/
 │   │   └── ...
 │   ├── pages/               # Page components (routes)
 │   │   ├── Home.vue         # Main daily dog page
+│   │   ├── DogDetail.vue    # Individual dog detail page
 │   │   ├── Favorites.vue    # Favorites collection
 │   │   └── History.vue      # View history
 │   ├── stores/              # Pinia state management
 │   │   └── dog-store.ts     # Central dog data store
 │   ├── composables/         # Reusable Vue 3 composables
 │   │   ├── use-dog.ts       # Dog data composable
+│   │   ├── use-dog-detail.ts # Dog detail page logic
 │   │   └── use-pwa.ts       # PWA composable
 │   ├── utils/               # Utility functions
 │   │   └── api-client.ts    # API calls with axios
@@ -103,9 +106,9 @@ npm install
 # Copy the example env file
 cp .env.example .env.local
 
-# Add your Dog API key from https://www.thedogapi.com/
-# Edit .env.local and add:
-# VITE_DOG_API_KEY=your_api_key_here
+# Edit .env.local and add your API keys:
+# VITE_DOG_API_KEY=your_api_key_here          # Required - from https://www.thedogapi.com/
+# VITE_WIKIPEDIA_ACCESS_TOKEN=your_token_here  # Optional - for higher rate limits
 ```
 
 3. **Start development server**
@@ -151,10 +154,10 @@ netlify dev         # Run with Netlify dev server (requires Netlify CLI)
 ## 🔐 Security & Privacy
 
 - **No Backend Required** - All data stored locally in browser
-- **Secure API Calls** - API key proxied through Netlify functions (never exposed client-side)
+- **Direct API Calls** - Currently calls The Dog API and Wikipedia API directly from client
+- **Serverless Option** - Netlify function available in `netlify/functions/dog.ts` for server-side API key handling
 - **localStorage Only** - Your favorites and history never sent to servers
 - **HTTPS Only** - All communications are encrypted
-- **CORS Handled** - Serverless function handles cross-origin requests
 
 ## 🌐 Deployment
 
@@ -176,7 +179,8 @@ git push origin main
 
 3. **Set Environment Variables**
    - Go to Site settings → Build & deploy → Environment
-   - Add `VITE_DOG_API_KEY` with your Dog API key
+   - Add `VITE_DOG_API_KEY` with your Dog API key (required)
+   - Optionally add `VITE_WIKIPEDIA_ACCESS_TOKEN` for higher rate limits
 
 4. **Deploy**
    - Push commits to trigger automatic deployments

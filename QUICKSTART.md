@@ -6,7 +6,8 @@ Get up and running in 5 minutes!
 
 - Node.js 16+ ([download](https://nodejs.org/))
 - npm (comes with Node.js)
-- Dog API Key ([get free key](https://www.thedogapi.com/))
+- Dog API Key - required ([get free key](https://www.thedogapi.com/))
+- Wikipedia Access Token - optional, for higher rate limits ([get one](https://meta.wikimedia.org/wiki/Special:OAuthConsumerRegistration))
 
 ## 2️⃣ Installation
 
@@ -24,9 +25,9 @@ npm install
 # Copy environment template
 cp .env.example .env.local
 
-# Edit .env.local and add your API key:
-# VITE_DOG_API_KEY=your_key_here
-# VITE_API_BASE_URL=http://localhost:5173
+# Edit .env.local and add your API keys:
+# VITE_DOG_API_KEY=your_key_here              # Required
+# VITE_WIKIPEDIA_ACCESS_TOKEN=your_token_here  # Optional - for higher rate limits
 ```
 
 ## 4️⃣ Start Development Server
@@ -73,7 +74,9 @@ npm run type-check   # 🔍 Check TypeScript types
 2. Connect repo to Netlify
 3. Build command: `npm run build`
 4. Publish directory: `dist`
-5. Add environment variable: `VITE_DOG_API_KEY`
+5. Add environment variables:
+   - `VITE_DOG_API_KEY` (required)
+   - `VITE_WIKIPEDIA_ACCESS_TOKEN` (optional)
 
 That's it! Your app will auto-deploy on every push. 🚀
 

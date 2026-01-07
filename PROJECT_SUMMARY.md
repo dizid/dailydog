@@ -147,7 +147,8 @@ Accent Orange     #FB923C   - Warmth
 
 ### APIs
 - The Dog API (dog pictures & data)
-- Netlify Functions (serverless proxy)
+- Wikipedia API (enriched breed info)
+- Netlify Functions (optional serverless proxy)
 
 ### Deployment
 - Netlify (CDN + serverless)
@@ -158,10 +159,11 @@ Accent Orange     #FB923C   - Warmth
 
 ## 📱 Features Implemented
 
-### Pages (3 routes)
+### Pages (4 routes)
 1. **Home** `/` - Daily dog discovery with featured display
-2. **Favorites** `/favorites` - Collection management
-3. **History** `/history` - Recently viewed dogs
+2. **Dog Detail** `/dog/:id` - Individual dog detail page with enriched breed info
+3. **Favorites** `/favorites` - Collection management
+4. **History** `/history` - Recently viewed dogs
 
 ### Interactions
 - ✅ Random dog fetch with loading state
@@ -189,9 +191,11 @@ Accent Orange     #FB923C   - Warmth
 # 1. Install dependencies
 npm install
 
-# 2. Set up API key
+# 2. Set up API keys
 cp .env.example .env.local
-# Edit .env.local with your Dog API key
+# Edit .env.local with your API keys:
+# - VITE_DOG_API_KEY (required)
+# - VITE_WIKIPEDIA_ACCESS_TOKEN (optional)
 
 # 3. Start dev server
 npm run dev
@@ -213,8 +217,10 @@ npm run type-check   # 🔍 TypeScript check
 
 1. Push to GitHub
 2. Connect to Netlify
-3. Set `VITE_DOG_API_KEY` environment variable
-4. Deploy! 🎉
+3. Set environment variables:
+   - `VITE_DOG_API_KEY` (required)
+   - `VITE_WIKIPEDIA_ACCESS_TOKEN` (optional)
+4. Deploy!
 
 ---
 
@@ -224,6 +230,7 @@ npm run type-check   # 🔍 TypeScript check
 - **README.md** - Complete documentation (installation, features, troubleshooting)
 - **QUICKSTART.md** - Quick setup guide (5 minute start)
 - **PROJECT_SUMMARY.md** - This file (what was built)
+- **CLAUDE.md** - Claude Code guidance for working with this codebase
 
 ### Code Documentation
 - Extensive TypeScript comments
@@ -281,10 +288,10 @@ npm run type-check   # 🔍 TypeScript check
 
 ## 🔐 Security & Privacy
 
-### API Security
-- API key **never** exposed client-side
-- Netlify function proxies all requests
-- Environment variables for sensitive data
+### API Architecture
+- Direct API calls to The Dog API and Wikipedia API from client
+- Netlify function available in `netlify/functions/dog.ts` for server-side API key handling
+- Environment variables for API keys
 - HTTPS required for deployment
 
 ### User Privacy
@@ -348,13 +355,15 @@ npm run type-check   # 🔍 TypeScript check
 - **Header.vue** - Navigation with theme toggle
 - **DogCard.vue** - Dog display with favorite button
 - **Home.vue** - Main discovery page
+- **DogDetail.vue** - Individual dog detail page
 - **Favorites.vue** - Collection view
 - **History.vue** - View history with stats
 
 ### Key Logic
 - **dog-store.ts** - Pinia store for state
 - **use-dog.ts** - Composable for dog logic
-- **api-client.ts** - API calls with retry
+- **use-dog-detail.ts** - Composable for dog detail page
+- **api-client.ts** - API calls to Dog API and Wikipedia
 - **use-pwa.ts** - PWA installation support
 
 ### Configuration
