@@ -70,8 +70,11 @@
           <p class="mb-2">
             Made with <span class="text-puppy-pink">❤️</span> for dog lovers everywhere
           </p>
-          <p>
+          <p class="mb-3">
             © {{ new Date().getFullYear() }} Daily Dog. All rights reserved.
+          </p>
+          <p class="text-base font-semibold">
+            A project by <a href="https://dizid.com" target="_blank" rel="noopener" class="text-puppy-blue hover:text-puppy-purple transition-colors underline underline-offset-2">dizid.com</a>
           </p>
         </div>
       </div>
