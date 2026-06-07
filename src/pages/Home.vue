@@ -22,6 +22,7 @@
           :dog="currentDog"
           :isFavorited="isFavorited"
           @toggle="toggleFavorite"
+          @share="handleShare"
         />
       </div>
 
@@ -113,6 +114,8 @@
 <script setup lang="ts">
 import { useDog } from '@/composables/use-dog'
 import { useDogStore } from '@/stores/dog-store'
+import { useShareCard } from '@/composables/use-share-card'
+import { useStreak } from '@/composables/use-streak'
 import DogCard from '@/components/DogCard.vue'
 import LoadingSkeleton from '@/components/LoadingSkeleton.vue'
 import ErrorAlert from '@/components/ErrorAlert.vue'
@@ -130,6 +133,19 @@ const {
   enrichedInfo,
   isLoadingEnrichment,
 } = useDog()
+
+const { generateShareCard, shareCard } = useShareCard()
+// streakDisplay is read-only here; Header.vue owns initializeStreak()
+const { streakDisplay } = useStreak()
+
+async function handleShare() {
+  if (!currentDog.value) return
+  const dataUrl = await generateShareCard(currentDog.value, streakDisplay.value)
+  if (dataUrl) {
+    const breedName = currentDog.value.breeds?.[0]?.name ?? 'dog'
+    await shareCard(dataUrl, breedName)
+  }
+}
 
 // Fetch initial dog on mount
 if (!currentDog.value) {

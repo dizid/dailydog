@@ -24,6 +24,15 @@
         {{ isFavorited ? '❤️' : '🤍' }}
       </button>
 
+      <!-- Share Button -->
+      <button
+        @click="emit('share')"
+        class="absolute top-20 right-4 w-12 h-12 rounded-full glass-effect flex items-center justify-center text-2xl transition-all duration-200 hover:scale-110 active:scale-95"
+        title="Share this dog"
+      >
+        📤
+      </button>
+
       <!-- Badge -->
       <div class="absolute top-4 left-4 px-3 py-1 rounded-full glass-effect text-sm font-semibold">
         🎲 {{ breed?.name || 'Unknown Breed' }}
@@ -69,6 +78,7 @@ interface Props {
 
 interface Emits {
   toggle: []
+  share: []
 }
 
 const props = withDefaults(defineProps<Props>(), {

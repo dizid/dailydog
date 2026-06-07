@@ -54,6 +54,15 @@
             {{ isFavorited ? '❤️' : '🤍' }}
           </button>
 
+          <!-- Share Button -->
+          <button
+            @click="handleShare"
+            class="absolute top-24 right-4 w-14 h-14 rounded-full glass-effect flex items-center justify-center text-3xl transition-all duration-200 hover:scale-110 active:scale-95"
+            title="Share this dog"
+          >
+            📤
+          </button>
+
           <!-- Breed Badge -->
           <div class="absolute bottom-4 left-4 px-4 py-2 rounded-full glass-effect text-lg font-semibold">
             🐕 {{ dogInfo?.name || 'Unknown Breed' }}
@@ -126,6 +135,8 @@
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router'
 import { useDogDetail } from '@/composables/use-dog-detail'
+import { useShareCard } from '@/composables/use-share-card'
+import { useStreak } from '@/composables/use-streak'
 import InfoItem from '@/components/InfoItem.vue'
 import BreedInfoSection from '@/components/BreedInfoSection.vue'
 
@@ -144,6 +155,18 @@ const {
   isFavorited,
   toggleFavorite,
 } = useDogDetail(dogId)
+
+const { generateShareCard, shareCard } = useShareCard()
+const { streakDisplay } = useStreak()
+
+async function handleShare() {
+  if (!dog.value) return
+  const dataUrl = await generateShareCard(dog.value, streakDisplay.value)
+  if (dataUrl) {
+    const breedName = dog.value.breeds?.[0]?.name ?? 'dog'
+    await shareCard(dataUrl, breedName)
+  }
+}
 
 const goBack = () => {
   if (window.history.length > 1) {
